@@ -1,24 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
 function App() {
+  const [rows, setRows] = useState(0);
+  const [columns, setColumns] = useState(0);
+  const [aliveCells, setAliveCells] = useState();
+  console.log(rows);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+      <input
+        type='number'
+        onChange={(event) => setRows(Number(event.target.value))}
+      />
+      <input
+        type='number'
+        onChange={(event) => setColumns(Number(event.target.value))}
+      />
+      <input
+        type='number'
+        onChange={(event) => setAliveCells(Number(event.target.value))}
+      />
+      <div>
+        {[...Array(rows).keys()].map((row) => (
+          <div className='gridRow'>
+            {[...Array(columns).keys()].map((column) => (
+              <div className='gridColumn'>x</div>
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

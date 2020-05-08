@@ -36,3 +36,13 @@
     transform: rotate(360deg);
   }
 }
+
+.gridRow {
+  display: flex;
+}
+
+.gridColumn {
+  height: 30px;
+  width: 30px;
+  border: 1px solid black;
+}
