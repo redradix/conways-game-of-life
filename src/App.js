@@ -61,7 +61,11 @@ function App() {
       <pre className="gol-grid">
         {grid.map((row, y) => [
           ...row.map((isAlive, x) => (
-            <span className="cell" key={x} onClick={handleClickCell(x, y)}>
+            <span
+              className="cell"
+              key={`${x}-${y}`}
+              onClick={handleClickCell(x, y)}
+            >
               {isAlive ? '#' : '·'}
             </span>
           )),
