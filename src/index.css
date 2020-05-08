@@ -11,3 +11,12 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+pre.gol-grid {
+  font-size: 200%;
+}
+
+span.cell {
+  cursor: pointer;
+  margin: 1px;
+}

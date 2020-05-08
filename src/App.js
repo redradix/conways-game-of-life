@@ -13,8 +13,10 @@ const initGameOfLifeGrid = (width, height) =>
         .map(() => Math.random() > 0.7),
     )
 
+const copyGrid = grid => grid.map(row => [...row])
+
 const stepGameOfLife = grid => {
-  const newGrid = grid.map(row => [...row])
+  const newGrid = copyGrid(grid)
 
   const height = newGrid.length
 
@@ -109,10 +111,23 @@ function App() {
     setGrid(newGrid)
   }
 
+  const handleClickCell = (x, y) => () => {
+    const newGrid = copyGrid(grid)
+    newGrid[y][x] = !newGrid[y][x]
+    setGrid(newGrid)
+  }
+
   return (
     <div>
-      <pre>
-        {grid.map(row => row.map(x => (x ? '#' : '·')).join('') + '\n')}
+      <pre className="gol-grid">
+        {grid.map((row, y) => [
+          ...row.map((isAlive, x) => (
+            <span className="cell" key={x} onClick={handleClickCell(x, y)}>
+              {isAlive ? '#' : '·'}
+            </span>
+          )),
+          '\n',
+        ])}
       </pre>
 
       <InputSetAxis label="Width" value={width} onChange={handleChangeWidth} />
