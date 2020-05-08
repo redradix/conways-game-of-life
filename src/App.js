@@ -111,7 +111,9 @@ function App() {
 
   return (
     <div>
-      <pre>{JSON.stringify(grid, null, 2)}</pre>
+      <pre>
+        {grid.map(row => row.map(x => (x ? '#' : '·')).join('') + '\n')}
+      </pre>
 
       <InputSetAxis label="Width" value={width} onChange={handleChangeWidth} />
       <InputSetAxis
