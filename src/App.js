@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import './App.css'
 
-const pauseGame = () => {}
+const pauseGame = () => { }
 
-const resetGame = () => {}
+const resetGame = () => { }
+
 
 function App() {
   const [board, setBoard] = useState([])
@@ -11,7 +12,40 @@ function App() {
   const [rows, setRows] = useState(5)
   const [columns, setColumns] = useState(5)
 
-  const startGame = () => {
+  const x = (x, y) => {
+    const neightbords = []
+
+    // const y1 = (x, y + 1)
+    // const y2 = (x, y - 1)
+    // const x1 = (x + 1, y)
+    // const x2 = (x - 1, y)
+    // const d1 = (x + 1, y - 1)
+    // const d2 = (x + 1, y + 1)
+    // const d3 = (x - 1, y + 1)
+    // const d4 = (x - 1, y - 1)
+
+    if (x === 0 && y === 0) {
+      const y1 = [x, y + 1]
+      const x1 = [x + 1, y]
+      const d2 = [x + 1, y + 1]
+      neightbords.push(y1)
+      neightbords.push(x1)
+      neightbords.push(d2)
+      neightbords.map(([x, y]) => console.log(board[x, y]))
+
+    }
+    if (x === columns) {
+
+    }
+    if (y === 0) {
+
+    }
+    if (y === rows) {
+
+    }
+  }
+
+  const createBoard = () => {
     const _board = []
 
     for (let i = 0; i < rows; i++) {
@@ -19,6 +53,11 @@ function App() {
     }
 
     setBoard(_board)
+  }
+
+  const startGame = () => {
+    console.log("HOLA")
+    x(0, 0)
   }
 
   const toggleCell = (x, y) => () => {
@@ -29,6 +68,7 @@ function App() {
 
   return (
     <div className="App">
+      <button onClick={createBoard}>Create board</button>
       <button onClick={startGame}>Start</button>
       <button onClick={pauseGame}>Pause</button>
       <button onClick={resetGame}>Reset</button>
