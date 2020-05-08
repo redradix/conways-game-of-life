@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import useInterval from "./useInterval"
 import logo from './logo.svg';
 import './App.css';
 
@@ -7,6 +8,17 @@ function App() {
   const [columns, setColumns] = useState(5);
   const [aliveCells, setAliveCells] = useState('');
   const [isStarted, setIsStarted] = useState(false);
+
+  const aliveCellsRef = useRef(aliveCells);
+  aliveCellsRef.current = aliveCells;
+
+  useInterval(() => {
+    // Your custom logic here
+    if (isStarted) {
+      calculateRound();
+
+    }
+  }, 1000);
 
   const generateGrid = () => {
     return [...Array(rows).keys()].map((row) => (
@@ -26,16 +38,25 @@ function App() {
     aliveCells.some((cell) => cell[0] === x && cell[1] === y)
 
   const calculateRound = () => {
-    [...Array(rows).keys()].map((row) => {
-      [...Array(columns).keys()].map((column) => {
-        console.log(`--> [${row}-${column}]`)
-        const neighbors = getNeighbors([row, column])
-        // console.log(neighbors.map((neighbor) => isAlive(neighbor)))
+    const newAlives = []
+
+    Array(rows).fill('').forEach((_,row) => {
+      Array(columns).fill('').forEach((_,column) => {
+        const current = [row, column]
+        const isCurrentAlive = isAlive(current)
+        const neighbors = getNeighbors(current)
         const aliveNeighbors = neighbors.map((neighbor) => isAlive(neighbor))
           .filter(aliveNeighbor => aliveNeighbor).length
-        console.log(aliveNeighbors)
+        if (
+          (!isCurrentAlive && aliveNeighbors === 3) || 
+          (isCurrentAlive && [2,3].includes(aliveNeighbors))) 
+        {
+          newAlives.push(current)
+        }
       });
-    });
+    })
+
+    setAliveCells(newAlives)
   };
 
   const getNeighbors = ([ x, y ]) => {
@@ -70,7 +91,10 @@ function App() {
           )
         }
       />
-      <button onClick={() => setIsStarted(true)}>Start</button>
+      <button onClick={() => {
+        setIsStarted(true)
+        
+      }}>Start</button>
       <button onClick={calculateRound}>Round</button>
       <div>{isStarted && generateGrid()}</div>
     </div>
