@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import InputSetAxis from './components/InputSetAxis'
 
 const DEFAULT_WIDTH = 10
 const DEFAULT_HEIGHT = 10
+const ALIVE_PROBABILITY = 0.7
+const DRAW_INTERVAL_MSECS = 200
 
 const initGameOfLifeGrid = (width, height) =>
   Array(height)
@@ -10,7 +12,7 @@ const initGameOfLifeGrid = (width, height) =>
     .map(() =>
       Array(width)
         .fill()
-        .map(() => Math.random() > 0.7),
+        .map(() => Math.random() > ALIVE_PROBABILITY),
     )
 
 const copyGrid = grid => grid.map(row => [...row])
@@ -117,6 +119,8 @@ function App() {
   const [isRunning, setIsRunning] = useState(false)
   const [grid, setGrid] = useState(initGameOfLifeGrid(width, height))
 
+  const intervalRef = useRef()
+
   const handleChangeWidth = width => {
     setWidth(width)
     const newGrid = setGridSize(grid, width, height)
@@ -131,16 +135,16 @@ function App() {
 
   const handleStart = () => {
     setIsRunning(true)
+    intervalRef.current = setInterval(handleStep, DRAW_INTERVAL_MSECS)
   }
 
   const handlePause = () => {
     setIsRunning(false)
+    clearInterval(intervalRef.current)
   }
 
   const handleStep = () => {
-    const newGrid = stepGameOfLife(grid)
-
-    setGrid(newGrid)
+    setGrid(oldGrid => stepGameOfLife(oldGrid))
   }
 
   const handleReset = () => {
