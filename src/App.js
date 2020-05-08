@@ -26,23 +26,20 @@ const getCoordinates = (rows, columns) => {
 }
 
 function App() {
-  const rows = 6
-  const columns = 6
-
-  const [data, setData] = useState([
-    false, false, false, false, false, false,
-    false, false, false, false, false, false,
-    false, false, true,  true,  true,  false,
-    false, true,  true,  true,  false, false,
-    false, false, false, false, false, false,
-    false, false, false, false, false, false,
-    false, false, false, false, false, false
-  ])
-
+  const [inputRows, setRows] = useState(6)
+  const [inputColumns, setColumns] = useState(6)
+  const [[rows, columns], setGridSize] = useState([0, 0])
+  const [data, setData] = useState([])
   const [playing, setPlaying] = useState(false)
 
   const isAlive = ([x, y], data) => {
     return data[rows * x + y]
+  }
+
+  const setAlive = i => {
+    const newData = [...data]
+    newData[i] = true
+    setData(newData)
   }
 
   const nextGeneration = useCallback(() => {
@@ -66,6 +63,11 @@ function App() {
     }
   }, [nextGeneration, playing])
 
+  const init = () => {
+    setGridSize([inputRows, inputColumns])
+    setData(Array(inputColumns * inputRows).fill(false))
+  }
+
   const play = () => {
     setPlaying(true)
   }
@@ -74,27 +76,44 @@ function App() {
     setPlaying(false)
   }
 
-  const printGeneration = () => {
-    function bla(ary) {
-      if (!ary.length) {
-        return []
-      }
-      const head = ary.slice(0, columns)
-      const tail = ary.slice(columns)
-      return [head, ...bla(tail)]
-    }
-
-    const nose = data.map(x => x ? 'x' : '.')
-    return bla(nose).map(x => x.join(' ')).join('\n')
-  }
-
   return (
     <div className="App">
-      <pre>
-        {  printGeneration() }
-      </pre>
-      <button onClick={play} disabled={playing}>Play</button>
+      <input
+        min='5'
+        type='number'
+        value={inputRows}
+        onChange={ev => setRows(ev.target.value) } />
+
+      <input
+        min='5'
+        type='number'
+        value={inputColumns}
+        onChange={ev => setColumns(ev.target.value) } />
+
+      <button onClick={init} disabled={playing}>Init</button>
+      <button onClick={play} disabled={playing || !data.length}>Play</button>
       <button onClick={pause} disabled={!playing}>Pause</button>
+
+      <br />
+      <br />
+
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${columns}, 1fr)`,
+        gridTemplateRows: `repeat(${rows}, 1fr)`,
+        height: '800px',
+        width: '800px'
+      }}>
+        {data.map((x, i) => <span
+          onClick={() => !playing && setAlive(i)}
+          key={i}
+          style={{
+            background: x ? 'black' : 'white',
+            border: '1px solid black',
+            alignSelf: 'strech'
+          }}></span>
+        )}
+      </div>
     </div>
   );
 }
