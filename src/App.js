@@ -1,18 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import './App.css'
 
-const pauseGame = () => {}
+const pauseGame = () => { }
 
-const resetGame = () => {}
+const resetGame = () => { }
 
 function App() {
+  const boardInterval = useRef()
   const [board, setBoard] = useState([])
 
-  const [rows, setRows] = useState(5)
-  const [columns, setColumns] = useState(5)
+  const [rows, setRows] = useState(10)
+  const [columns, setColumns] = useState(10)
 
-  const getNeighbours = (x, y) => {
-    const neighbors = [
+  const getNeighboursAlived = (x, y) => {
+    const neighbours = [
       [x, y + 1],
       [x, y - 1],
       [x + 1, y],
@@ -23,9 +24,9 @@ function App() {
       [x - 1, y - 1],
     ]
 
-    return neighbors.filter(
-      ([x, y]) => x >= 0 && y >= 0 && x <= rows - 1 && y <= columns - 1
-    )
+    return neighbours.filter(
+      ([x, y]) => x >= 0 && y >= 0 && x <= rows - 1 && y <= columns - 1 && board[x][y]
+    ).length
   }
 
   const createBoard = () => {
@@ -38,13 +39,26 @@ function App() {
     setBoard(_board)
   }
 
-  const startGame = () => {
-    for (let row in board) {
-      for (let column in board[row]) {
-        const neighbors = getNeighbours(Number(row), Number(column))
-        console.log(neighbors)
-      }
+  const business = (row, column, neighboursAlived, nextBoard) => {
+    if (board[row][column] && (neighboursAlived < 2 || neighboursAlived > 3)) {
+      nextBoard[row][column] = false
     }
+    if (!board[row][column] && neighboursAlived === 3) {
+      nextBoard[row][column] = true
+    }
+  }
+
+  const startGame = () => {
+    setInterval(() => {
+      const nextBoard = JSON.parse(JSON.stringify(board))
+      for (let row in board) {
+        for (let column in board[row]) {
+          const neighboursAlived = getNeighboursAlived(Number(row), Number(column))
+          business(row, column, neighboursAlived, nextBoard)
+        }
+      }
+      setBoard(nextBoard)
+    }, 500)
   }
 
   const toggleCell = (x, y) => () => {
