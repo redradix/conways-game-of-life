@@ -15,9 +15,15 @@ function App() {
     const _board = []
 
     for (let i = 0; i < rows; i++) {
-      _board.push(Array(Number(columns)).fill('false'))
+      _board.push(Array(Number(columns)).fill(false))
     }
 
+    setBoard(_board)
+  }
+
+  const toggleCell = (x, y) => () => {
+    const _board = [...board]
+    _board[x][y] = !_board[x][y]
     setBoard(_board)
   }
 
@@ -44,15 +50,21 @@ function App() {
           display: 'grid',
           gridTemplateRows: `repeat(${rows}, 1fr)`,
           gridTemplateColumns: `repeat(${columns}, 1fr)`,
+          height: '800px',
         }}
         className="board"
       >
         {board.map((row, x) =>
           row.map((cell, y) => (
-            <div>
-              {x}
-              {y}
-            </div>
+            <div
+              style={{
+                backgroundColor: cell ? 'black' : null,
+                border: '1px solid black',
+                alignSelf: 'stretch',
+              }}
+              key={`${x}-${y}`}
+              onClick={toggleCell(x, y)}
+            ></div>
           ))
         )}
       </div>
