@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import './App.css'
 
 const pauseGame = () => { }
@@ -6,8 +6,8 @@ const pauseGame = () => { }
 const resetGame = () => { }
 
 function App() {
-  const boardInterval = useRef()
   const [board, setBoard] = useState([])
+  const [started, setStarted] = useState(false)
 
   const [rows, setRows] = useState(10)
   const [columns, setColumns] = useState(10)
@@ -48,7 +48,17 @@ function App() {
     }
   }
 
-  const startGame = () => {
+
+  function sleep(milliseconds) {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+      currentDate = Date.now();
+    } while (currentDate - date < milliseconds);
+  }
+
+
+  const loopGame = () => {
     const nextBoard = JSON.parse(JSON.stringify(board))
     for (let row in board) {
       for (let column in board[row]) {
@@ -57,6 +67,18 @@ function App() {
       }
     }
     setBoard(nextBoard)
+  }
+
+  useEffect(() => {
+    if (started) {
+      sleep(1000)
+      loopGame()
+    }
+  }, [board])
+
+  const startGame = () => {
+    setStarted(true)
+    loopGame()
   }
 
   const toggleCell = (x, y) => () => {
