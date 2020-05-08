@@ -28,14 +28,21 @@ const stepGameOfLife = grid => {
 
       for (let dy = -1; dy <= 1; dy++) {
         for (let dx = -1; dx <= 1; dx++) {
+          // Discard itself
+          if (dx === 0 && dy === 0) {
+            continue
+          }
+
           const xx = x + dx
 
+          // Count outside (horizontal) as dead
           if (xx < 0 || xx >= width) {
             continue
           }
 
           const yy = y + dy
 
+          // Count outside (vertical) as dead
           if (yy < 0 || yy >= height) {
             continue
           }
