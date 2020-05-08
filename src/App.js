@@ -49,16 +49,14 @@ function App() {
   }
 
   const startGame = () => {
-    setInterval(() => {
-      const nextBoard = JSON.parse(JSON.stringify(board))
-      for (let row in board) {
-        for (let column in board[row]) {
-          const neighboursAlived = getNeighboursAlived(Number(row), Number(column))
-          business(row, column, neighboursAlived, nextBoard)
-        }
+    const nextBoard = JSON.parse(JSON.stringify(board))
+    for (let row in board) {
+      for (let column in board[row]) {
+        const neighboursAlived = getNeighboursAlived(Number(row), Number(column))
+        business(row, column, neighboursAlived, nextBoard)
       }
-      setBoard(nextBoard)
-    }, 500)
+    }
+    setBoard(nextBoard)
   }
 
   const toggleCell = (x, y) => () => {
