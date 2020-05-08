@@ -1,17 +1,9 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useReducer } from 'react'
 import './App.css'
 
-const pauseGame = () => { }
+const resetGame = () => {}
 
-const resetGame = () => { }
-
-function App() {
-  const boardInterval = useRef()
-  const [board, setBoard] = useState([])
-
-  const [rows, setRows] = useState(10)
-  const [columns, setColumns] = useState(10)
-
+const reducer = (state = {}, action) => {
   const getNeighboursAlived = (x, y) => {
     const neighbours = [
       [x, y + 1],
@@ -25,44 +17,94 @@ function App() {
     ]
 
     return neighbours.filter(
-      ([x, y]) => x >= 0 && y >= 0 && x <= rows - 1 && y <= columns - 1 && board[x][y]
+      ([x, y]) =>
+        x >= 0 &&
+        y >= 0 &&
+        x <= state.rows - 1 &&
+        y <= state.columns - 1 &&
+        state.board[x][y]
     ).length
   }
 
-  const createBoard = () => {
-    const _board = []
-
-    for (let i = 0; i < rows; i++) {
-      _board.push(Array(Number(columns)).fill(false))
-    }
-
-    setBoard(_board)
-  }
-
   const business = (row, column, neighboursAlived, nextBoard) => {
-    if (board[row][column] && (neighboursAlived < 2 || neighboursAlived > 3)) {
+    if (
+      state.board[row][column] &&
+      (neighboursAlived < 2 || neighboursAlived > 3)
+    ) {
       nextBoard[row][column] = false
     }
-    if (!board[row][column] && neighboursAlived === 3) {
+    if (!state.board[row][column] && neighboursAlived === 3) {
       nextBoard[row][column] = true
     }
   }
 
-  const startGame = () => {
-    const nextBoard = JSON.parse(JSON.stringify(board))
-    for (let row in board) {
-      for (let column in board[row]) {
-        const neighboursAlived = getNeighboursAlived(Number(row), Number(column))
-        business(row, column, neighboursAlived, nextBoard)
+  switch (action.type) {
+    case 'init': {
+      const { columns, rows } = action.payload
+      const board = []
+
+      for (let i = 0; i < rows; i++) {
+        board.push(Array(Number(columns)).fill(false))
       }
+
+      return { board, columns, rows }
     }
-    setBoard(nextBoard)
+
+    case 'toggle': {
+      const { x, y } = action.payload
+      const board = JSON.parse(JSON.stringify(state.board))
+
+      board[x][y] = !state.board[x][y]
+
+      return { ...state, board }
+    }
+
+    case 'nextBoard': {
+      const nextBoard = JSON.parse(JSON.stringify(state.board))
+
+      for (let row in state.board) {
+        for (let column in state.board[row]) {
+          const neighboursAlived = getNeighboursAlived(
+            Number(row),
+            Number(column)
+          )
+          business(row, column, neighboursAlived, nextBoard)
+        }
+      }
+
+      return { ...state, board: nextBoard }
+    }
+
+    default: {
+      return state
+    }
+  }
+}
+
+function App() {
+  const boardInterval = useRef()
+
+  const [game, dispatch] = useReducer(reducer, { board: [] })
+
+  const [rows, setRows] = useState(10)
+  const [columns, setColumns] = useState(10)
+
+  const createBoard = () => {
+    dispatch({ type: 'init', payload: { rows, columns } })
+  }
+
+  const startGame = () => {
+    boardInterval.current = setInterval(() => {
+      dispatch({ type: 'nextBoard' })
+    }, 300)
+  }
+
+  const pauseGame = () => {
+    clearInterval(boardInterval.current)
   }
 
   const toggleCell = (x, y) => () => {
-    const _board = [...board]
-    _board[x][y] = !_board[x][y]
-    setBoard(_board)
+    dispatch({ type: 'toggle', payload: { x, y } })
   }
 
   return (
@@ -93,7 +135,7 @@ function App() {
         }}
         className="board"
       >
-        {board.map((row, x) =>
+        {game.board.map((row, x) =>
           row.map((cell, y) => (
             <div
               style={{
