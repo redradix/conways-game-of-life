@@ -1,8 +1,6 @@
 import React, { useState, useRef, useReducer } from 'react'
 import './App.css'
 
-const resetGame = () => {}
-
 const reducer = (state = {}, action) => {
   const getNeighboursAlived = (x, y) => {
     const neighbours = [
@@ -103,6 +101,10 @@ function App() {
     clearInterval(boardInterval.current)
   }
 
+  const resetGame = () => {
+    dispatch({ type: 'init', payload: { rows: 0, columns: 0 } })
+  }
+
   const toggleCell = (x, y) => () => {
     dispatch({ type: 'toggle', payload: { x, y } })
   }
@@ -129,8 +131,8 @@ function App() {
       <div
         style={{
           display: 'grid',
-          gridTemplateRows: `repeat(${rows}, 1fr)`,
-          gridTemplateColumns: `repeat(${columns}, 1fr)`,
+          gridTemplateRows: `repeat(${game.rows}, 1fr)`,
+          gridTemplateColumns: `repeat(${game.columns}, 1fr)`,
           height: '800px',
         }}
         className="board"
