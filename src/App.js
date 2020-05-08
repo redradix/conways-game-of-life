@@ -152,6 +152,10 @@ function App() {
     setGrid(newGrid)
   }
 
+  const handleEmpty = () => {
+    setGrid(setGridSize([], width, height))
+  }
+
   const handleClickCell = (x, y) => () => {
     const newGrid = copyGrid(grid)
     newGrid[y][x] = !newGrid[y][x]
@@ -185,6 +189,7 @@ function App() {
         →
       </button>
       <button onClick={handleReset}>↺</button>
+      <button onClick={handleEmpty}>Empty</button>
     </div>
   )
 }
