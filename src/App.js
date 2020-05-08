@@ -15,6 +15,39 @@ const initGameOfLifeGrid = (width, height) =>
 
 const copyGrid = grid => grid.map(row => [...row])
 
+const setRowSize = w => row => {
+  const smaller = row.slice(0, w)
+
+  const difference = w - row.length
+
+  if (difference <= 0) {
+    return smaller
+  }
+
+  return [...smaller, ...Array(difference).fill(false)]
+}
+
+const setGridSize = (grid, w, h) => {
+  const smaller = grid.slice(0, h).map(setRowSize(w))
+
+  const difference = h - grid.length
+
+  if (difference <= 0) {
+    return smaller
+  }
+
+  return [
+    ...smaller,
+    ...Array(difference)
+      .fill()
+      .map(() =>
+        Array(w)
+          .fill()
+          .map(() => false),
+      ),
+  ]
+}
+
 const stepGameOfLife = grid => {
   const newGrid = copyGrid(grid)
 
@@ -86,10 +119,14 @@ function App() {
 
   const handleChangeWidth = width => {
     setWidth(width)
+    const newGrid = setGridSize(grid, width, height)
+    setGrid(newGrid)
   }
 
   const handleChangeHeight = height => {
     setHeight(height)
+    const newGrid = setGridSize(grid, width, height)
+    setGrid(newGrid)
   }
 
   const handleStart = () => {
