@@ -31,7 +31,7 @@ function App() {
       neightbords.push(y1)
       neightbords.push(x1)
       neightbords.push(d2)
-      neightbords.map(([x, y]) => console.log(board[x, y]))
+      neightbords.map(([x, y]) => console.log(board[x][y]))
 
     }
     if (x === columns) {
