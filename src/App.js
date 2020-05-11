@@ -5,7 +5,7 @@ const getNeightbours = ([x, y]) => {
     [x - 1, y - 1], [x, y - 1], [x + 1, y - 1],
     [x - 1, y    ],             [x + 1, y    ],
     [x - 1, y + 1], [x, y + 1], [x + 1, y + 1],
-  ]
+  ].filter(([x, y]) => x >= 0 && y >= 0)
 }
 
 const business = (amIAlive, aliveNeightbours) =>
@@ -29,12 +29,14 @@ function App() {
   const [inputRows, setRows] = useState(6)
   const [inputColumns, setColumns] = useState(6)
   const [[rows, columns], setGridSize] = useState([0, 0])
+  const [coordinates, setCoordinates] = useState([])
   const [data, setData] = useState([])
   const [playing, setPlaying] = useState(false)
 
-  const isAlive = ([x, y], data) => {
-    return data[rows * x + y]
-  }
+  const isAlive = useCallback(
+    ([x, y]) => data[rows * x + y],
+    [data, rows]
+  )
 
   const setAlive = i => {
     const newData = [...data]
@@ -42,29 +44,38 @@ function App() {
     setData(newData)
   }
 
-  const nextGeneration = useCallback(() => {
-    const coordinates = getCoordinates(rows, columns)
-    return coordinates.map(coordinate => {
-        const aliveNeightbours = getNeightbours(coordinate)
-          .map(neightbour => isAlive(neightbour, data))
-          .filter(alive => alive)
-          .length
-        const amIAlive = isAlive(coordinate, data)
-        return business(amIAlive, aliveNeightbours)
-      })
-  }, [data])
+  const calculateNextStatus = useCallback(
+    coordinate => {
+      const aliveNeightbours = getNeightbours(coordinate)
+        .map(isAlive)
+        .filter(alive => alive)
+        .length
+      const amIAlive = isAlive(coordinate)
+      return business(amIAlive, aliveNeightbours)
+    },
+    [isAlive]
+  )
 
-  useEffect(() => {
-    if (playing) {
-      const timer = setTimeout(() => {
-        setData(nextGeneration())
-      }, 1000)
-      return () => clearTimeout(timer)
-    }
-  }, [nextGeneration, playing])
+  const calculateNextGeneration = useCallback(
+    () => coordinates.map(calculateNextStatus),
+    [coordinates, calculateNextStatus]
+  )
+
+  useEffect(
+    () => {
+      if (playing) {
+        const timer = setTimeout(() => {
+          setData(calculateNextGeneration())
+        }, 1000)
+        return () => clearTimeout(timer)
+      }
+    },
+    [calculateNextGeneration, playing]
+  )
 
   const init = () => {
     setGridSize([inputRows, inputColumns])
+    setCoordinates(getCoordinates(inputRows, inputColumns))
     setData(Array(inputColumns * inputRows).fill(false))
   }
 
